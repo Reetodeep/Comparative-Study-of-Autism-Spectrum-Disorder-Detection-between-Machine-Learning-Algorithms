@@ -1,129 +1,163 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+import numpy as np
+import pandas as pd
+import os
+print(os.listdir("../input"))
+import matplotlib.pyplot as plt
+import seaborn as sns
+df1 = pd.read_csv('../input/autism-screening/Autism_Data.arff',na_values='?')
+df2 = pd.read_csv('../input/autism-screening-for-toddlers/Toddler Autism dataset July 2018.csv',na_values='?')
+df1.head()
+df1.info()
+df2.head()
+df2.info()
 
-# C extensions
-*.so
+EXPLORATORY DATA ANALYSIS
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+sns.set_style('whitegrid')
+data1= df1[df1['Class/ASD']=='YES']
+data2= df2[df2['Class/ASD Traits ']=='Yes']
+print("Adults: ",len(data1)/len(df1) * 100)
+print("Toddlers:",len(data2)/len(df2) * 100)
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+MISSING VALUES
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+fig, ax = plt.subplots(1,2,figsize=(15,4))
+sns.heatmap(data1.isnull(),yticklabels=False,cbar=False,cmap='viridis',ax=ax[0])
+ax[0].set_title('Adult dataset')
+sns.heatmap(data2.isnull(),yticklabels=False,cbar=False,cmap='viridis',ax=ax[1])
+ax[1].set_title('Toddlers dataset')
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
+JAUNDICE BORN BASED ON GENDER
 
-# Translations
-*.mo
-*.pot
+fig, ax = plt.subplots(1,2,figsize=(15,6))
+sns.countplot(x='jundice',data=data1,hue='gender',ax=ax[0])
+ax[0].set_title('ASD positive Adults born with jaundice based on gender')
+ax[0].set_xlabel('Jaundice while birth')
+sns.countplot(x='Jaundice',data=data2,hue='Sex',ax=ax[1])
+ax[1].set_title('ASD positive Toddlers born with jaundice based on gender')
+ax[1].set_xlabel('Jaundice while birth')
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+AGE DISTRIBUTION OF AUTISM SPECTRUM DISORDER(ASD) POSITIVE
 
-# Flask stuff:
-instance/
-.webassets-cache
+fig, ax = plt.subplots(1,2,figsize=(15,4))
+sns.distplot(data1['age'],kde=False,bins=45,color='darkred',ax=ax[0])
+ax[0].set_xlabel('Adult age in years')
+ax[0].set_title('Age distribution of ASD positive')
+sns.distplot(data2['Age_Mons'],kde=False,bins=30,color='darkred',ax=ax[1])
+ax[1].set_xlabel('Toddlers age in months')
+ax[1].set_title('Age distribution of ASD positive')
 
-# Scrapy stuff:
-.scrapy
+POSITIVE ASD ADULTS IN TOP 15 COUNTRIES
 
-# Sphinx documentation
-docs/_build/
+sns.countplot(x='contry_of_res',data=data1,order= data1['contry_of_res'].value_counts().
+Out[26]:
+Text(0.5,1,'Age distribution of ASD positive')
+index[:15],hue='gender',palette='viridis')
+plt.title('Positive ASD Adults country wise distribution')
+plt.xlabel('Countries')
+plt.tight_layout()
 
-# PyBuilder
-target/
+ETHNICITY VALUE COUNTS
 
-# Jupyter Notebook
-.ipynb_checkpoints
+print(data1['ethnicity'].value_counts())
+data2['Ethnicity'].value_counts()
 
-# IPython
-profile_default/
-ipython_config.py
+ASD DISTRIBUTION OF ADULT WHITE AND EUROPEAN ETHNICITY
 
-# pyenv
-.python-version
+plt.figure(figsize=(12,6))
+sns.countplot(x='contry_of_res',data=data1[data1['ethnicity']=='White-European'],order=d
+ata1[data1['ethnicity']=='White-European']['contry_of_res'].value_counts().index[:10],pa
+lette='viridis')
+plt.title('Positive ASD of White and European Ethnicities country wise distribution')
+plt.xlabel('Countries')
+plt.tight_layout()
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
+ASD DISTRIBUTION IN FAMILY
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
-__pypackages__/
+fig, ax = plt.subplots(1,2,figsize=(15,4))
+sns.countplot(x='austim',data=data1,hue='ethnicity',palette='rainbow',ax=ax[0])
+ax[0].set_title('Positive ASD Adult relatives with Autism distribution for different ethn
+icities')
+ax[0].set_xlabel('Adult Relatives with ASD')
+sns.countplot(x='Family_mem_with_ASD',data=data2,hue='Ethnicity',palette='rainbow',ax=ax
+[1])
+ax[1].set_title('Positive ASD Toddler relatives with Autism distribution for different et
+hnicities')
+ax[1].set_xlabel('Toddler Relatives with ASD')
+plt.tight_layout()
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
+FEATURE ENGINEERING
 
-# SageMath parsed files
-*.sage.py
+within24_36= pd.get_dummies(df2['Age_Mons']>24,drop_first=True)
+within0_12 = pd.get_dummies(df2['Age_Mons']<13,drop_first=True)
+male=pd.get_dummies(df2['Sex'],drop_first=True)
+ethnics=pd.get_dummies(df2['Ethnicity'],drop_first=True)
+jaundice=pd.get_dummies(df2['Jaundice'],drop_first=True)
+ASD_genes=pd.get_dummies(df2['Family_mem_with_ASD'],drop_first=True)
+ASD_traits=pd.get_dummies(df2['Class/ASD Traits '],drop_first=True)
+final_data= pd.concat([within0_12,within24_36,male,ethnics,jaundice,ASD_genes,ASD_traits
+],axis=1)
+final_data.columns=['within0_12','within24_36','male','Latino','Native Indian','Others','
+Pacifica','White European','asian','black','middle eastern','mixed','south asian','jaund
+ice','ASD_genes','ASD_traits']
+final_data.head()
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+MODEL BUILDING
 
-# Spyder project settings
-.spyderproject
-.spyproject
+from sklearn.model_selection import train_test_split
+X= final_data.iloc[:,:-1]
+y= final_data.iloc[:,-1]
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=101)
 
-# Rope project settings
-.ropeproject
+LOGISTIC REGRESSION
 
-# mkdocs documentation
-/site
+from sklearn.linear_model import LogisticRegression
+logmodel= LogisticRegression()
+logmodel.fit(X_train,y_train)
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV
+param_grid = {'C': [0.01,0.1,1,10,100,1000]}
+grid_log = GridSearchCV(LogisticRegression(),param_grid,refit=True)
+grid_log.fit(X_train,y_train)
+grid_log.best_estimator_
+pred_log=grid_log.predict(X_test)
+from sklearn.metrics import classification_report,confusion_matrix
+print(confusion_matrix(y_test,pred_log))
+print(classification_report(y_test,pred_log))
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+RANDOM FOREST CLASSIFIER
 
-# Pyre type checker
-.pyre/
+from sklearn.ensemble import RandomForestClassifier
+rfc= RandomForestClassifier(n_estimators=500)
+rfc.fit(X_train,y_train)
+pred_rfc= rfc.predict(X_test)
+print(confusion_matrix(y_test,pred_rfc))
+print(classification_report(y_test,pred_rfc))
+
+KNN CLASSIFIER
+
+from sklearn.preprocessing import StandardScaler
+scaler= StandardScaler()
+scaler.fit(X)
+scaled_features = scaler.transform(X)
+X_scaled = pd.DataFrame(scaled_features,columns=X.columns)
+X_scaled.head()
+X_train,X_test,y_train,y_test = train_test_split(X_scaled,y,test_size=0.2,random_state=101)
+from sklearn.neighbors import KNeighborsClassifier
+error_rate =[]
+for i in range (1,50):
+knn= KNeighborsClassifier(n_neighbors=i)
+knn.fit(X_train,y_train)
+pred_i= knn.predict(X_test)
+error_rate.append(np.mean(pred_i != y_test))
+plt.figure(figsize=(10,4))
+plt.plot(range(1,50),error_rate,color='blue',linestyle='dashed',marker='o',markerfacecolor='red',markersize=10)
+plt.title('Error rate vs K-value')
+plt.xlabel('K')
+plt.ylabel('Error Rate')
+knn= KNeighborsClassifier(n_neighbors=13)
+knn.fit(X_train,y_train)
+pred_knn=knn.predict(X_test)
+pred_knn=knn.predict(X_test)
+print(confusion_matrix(y_test,pred_knn))
+print(classification_report(y_test,pred_knn))
