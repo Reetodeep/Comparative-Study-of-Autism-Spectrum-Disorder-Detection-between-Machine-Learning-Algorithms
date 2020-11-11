@@ -1,0 +1,2 @@
+# Comparative-Study-of-Autism-Spectrum-Disorder-Detection-between-Machine-Learning-Algorithms
+India, with near about 855,000 positive cases, is the largest contributor of autistic children worldwide. It is said to be influenced by environmental and genetic causes; with no clear answer provided by the researchers till now. Brain imaging of autism affected children revealed that their brain structures are different than other neurotypical children, so it is widely accepted that damaged brain structure caused Autism Spectrum Disorder.
